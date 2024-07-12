@@ -28,90 +28,109 @@ public class CsvDataController {
 	private CsvDataService csvDataService;
 
 	@PostMapping
-	public List<CsvDataEntity> uploadData(@RequestParam("file") MultipartFile csvFile) throws IOException, CsvValidationException, NumberFormatException{
-		
+	public List<CsvDataEntity> uploadData(@RequestParam("file") MultipartFile csvFile)
+			throws IOException, CsvValidationException, NumberFormatException {
+
 		List<CsvDataDto> dataDtos = new ArrayList<>();
-		
-		try (CSVReader reader = new CSVReader(new InputStreamReader(csvFile.getInputStream(), StandardCharsets.UTF_8))) {
-          String[] data;
-          System.out.println(reader.readNext());
-          
-          while ((data = reader.readNext()) != null) {
-            // Each line in the CSV file is represented as an array of strings
-        	
-        	
-        	CsvDataDto dto = new CsvDataDto();
-			dto.setYear(Integer.parseInt(data[0]));
-			dto.setIndustry_aggregation_NZSIOC(data[1]);
-			dto.setIndustry_code_NZSIOC(data[2]); 
-			dto.setIndustry_name_NZSIOC(data[3]);
-			dto.setUnits(data[4]);
-			dto.setVariable_code(data[5]);
-			dto.setVariable_name(data[6]);
-			dto.setVariable_category(data[7]);
-			dto.setValue(data[8]);
-			dto.setIndustry_code_ANZSIC06(data[9]);
-				
-			
-			dataDtos.add(dto);
-			System.out.println(dataDtos);
 
-		
-		
-	}
-          return csvDataService.updateCsvFile(dataDtos);
-	
-	
+		try (CSVReader reader = new CSVReader(
+				new InputStreamReader(csvFile.getInputStream(), StandardCharsets.UTF_8))) {
+			String[] data;
+			System.out.println(reader.readNext());
+
+			while ((data = reader.readNext()) != null) {
+				// Each line in the CSV file is represented as an array of strings
+
+				CsvDataDto dto = new CsvDataDto();
+				dto.setYear(Integer.parseInt(data[0]));
+				dto.setIndustry_aggregation_NZSIOC(data[1]);
+				dto.setIndustry_code_NZSIOC(data[2]);
+				dto.setIndustry_name_NZSIOC(data[3]);
+				dto.setUnits(data[4]);
+				dto.setVariable_code(data[5]);
+				dto.setVariable_name(data[6]);
+				dto.setVariable_category(data[7]);
+				dto.setValue(data[8]);
+				dto.setIndustry_code_ANZSIC06(data[9]);
+
+				dataDtos.add(dto);
+				System.out.println(dataDtos);
+
+			}
+			return csvDataService.updateCsvFile(dataDtos);
+
+		}
 
 	}
-	
-	
 
-	}
 	@GetMapping()
 	public List<CsvDataEntity> getAll(
-			@RequestParam(value = "pageNumber",defaultValue = "1",required = false)Integer pageNumber,
-			@RequestParam(value = "pageSize",defaultValue = "10" ,required = false)Integer pageSize){
-		List<CsvDataEntity> dto=csvDataService.getAll(pageNumber,pageSize);
-		for(CsvDataEntity en:dto) {
-		System.out.println(dto+"+++++++");
-		System.out.println();
+			@RequestParam(value = "pageNumber", defaultValue = "1", required = false) Integer pageNumber,
+			@RequestParam(value = "pageSize", defaultValue = "10", required = false) Integer pageSize) {
+		List<CsvDataEntity> dto = csvDataService.getAll(pageNumber, pageSize);
+		for (CsvDataEntity en : dto) {
+			System.out.println(dto + "+++++++");
+			System.out.println();
 		}
 		return dto;
 	}
-	
-	@GetMapping("/search")
-	public List<CsvDataEntity> getByYear(@RequestParam(value = "pageNumber",defaultValue = "1",required = false)Integer pageNumber,@RequestParam(value = "pageSize",defaultValue = "10" ,required = false)Integer pageSize,@RequestParam Optional<Integer> year){
-	List<CsvDataEntity> dto=null;
-		if(!year.isEmpty()) {
-			dto=csvDataService.getByYear(pageNumber,pageSize,year);
-		}
-		else {
-			dto=csvDataService.getAll(pageNumber,pageSize);
+
+	@GetMapping("/year")
+	public List<CsvDataEntity> getByYear(
+			@RequestParam(value = "pageNumber", defaultValue = "1", required = false) Integer pageNumber,
+			@RequestParam(value = "pageSize", defaultValue = "10", required = false) Integer pageSize,
+			@RequestParam Optional<Integer> year) {
+		List<CsvDataEntity> dto = null;
+		if (!year.isEmpty()) {
+			dto = csvDataService.getByYear(pageNumber, pageSize, year);
+		} else {
+			dto = csvDataService.getAll(pageNumber, pageSize);
 		}
 		return dto;
-}
-	
-	@GetMapping("/searching")
-	public List<CsvDataEntity> findByVariableName(@RequestParam(value = "pageNumber",defaultValue = "1",required = false)Integer pageNumber,@RequestParam(value = "pageSize",defaultValue = "10" ,required = false)Integer pageSize,@RequestParam(required = false) Optional<String> variableName){
-		List<CsvDataEntity> dto=null;
+	}
+
+	@GetMapping("/variable-name")
+	public List<CsvDataEntity> findByVariableName(
+			@RequestParam(value = "pageNumber", defaultValue = "1", required = false) Integer pageNumber,
+			@RequestParam(value = "pageSize", defaultValue = "10", required = false) Integer pageSize,
+			@RequestParam(required = false) Optional<String> variableName) {
+		List<CsvDataEntity> dto = null;
 //		List<CsvDataEntity> dto= csvDataService.getByVariableName(pageNumber,pageSize,variableName);
-		if(!(variableName.isEmpty())) {
-			dto=csvDataService.getByVariableName(pageNumber,pageSize,variableName);
-			
-		}
-		else {
-			dto=csvDataService.getAll(pageNumber,pageSize);
+		if (!(variableName.isEmpty())) {
+			dto = csvDataService.getByVariableName(pageNumber, pageSize, variableName);
+
+		} else {
+			dto = csvDataService.getAll(pageNumber, pageSize);
 		}
 		return dto;
-}
-	@GetMapping("/searc")
-	public List<CsvDataEntity> findByIndustryCodeANZSIC06(@RequestParam(value = "pageNumber",defaultValue = "1",required = false)Integer pageNumber,@RequestParam(value = "pageSize",defaultValue = "10" ,required = false)Integer pageSize,@RequestParam(required = false) Optional<String> industryCodeANZSIC06){
-	
+	}
 
-		List<CsvDataEntity> dto=csvDataService.getByVariableName(pageNumber,pageSize,industryCodeANZSIC06);
+	@GetMapping("/searchByIndustryCode")
+	public List<CsvDataEntity> findByIndustryCodeANZSIC06(
+			@RequestParam(value = "pageNumber", defaultValue = "1", required = false) Integer pageNumber,
+			@RequestParam(value = "pageSize", defaultValue = "10", required = false) Integer pageSize,
+			@RequestParam(required = false) Optional<String> industryCodeANZSIC06) {
+
+		List<CsvDataEntity> dto = csvDataService.getByVariableName(pageNumber, pageSize, industryCodeANZSIC06);
 
 		return dto;
-}
-	
+	}
+
+	@GetMapping("/yearAndVariableName")
+	public List<CsvDataEntity> findByYearAndVariableName(
+			@RequestParam(value = "pageNumber", defaultValue = "1", required = false) Integer pageNumber,
+			@RequestParam(value = "pageSize", defaultValue = "10", required = false) Integer pageSize,
+			@RequestParam(required = false) Optional<String> variableName,
+			@RequestParam(required = false) Optional<Integer> year) {
+		List<CsvDataEntity> dto = null;
+//		List<CsvDataEntity> dto= csvDataService.getByVariableName(pageNumber,pageSize,variableName);
+		if (!(variableName.isEmpty() && !year.isEmpty())) {
+			dto = csvDataService.findByYearAndVariableName(year, variableName, pageSize, pageNumber);
+
+		} else {
+			dto = csvDataService.getAll(pageNumber, pageSize);
+		}
+		return dto;
+	}
+
 }
